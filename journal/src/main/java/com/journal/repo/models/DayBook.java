@@ -16,13 +16,13 @@ public class DayBook extends Base {
     private Date timestamp;
 
     @Field(value = "debit")
-    private long debit; // expenses
+    private long debit;
 
     @Field(value = "debtor")
     private String debtor; // account name of debtor, case insensitive
 
     @Field(value = "credit")
-    private long credit; // gains
+    private long credit;
 
     @Field(value = "creditor")
     private String creditor; // account name of creditor, case insensitive
