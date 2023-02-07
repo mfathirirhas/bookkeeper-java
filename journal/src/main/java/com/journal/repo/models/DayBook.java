@@ -18,14 +18,14 @@ public class DayBook extends Base {
     @Field(value = "debit")
     private long debit;
 
-    @Field(value = "debtor")
-    private String debtor; // account name of debtor, case insensitive
+    @Field(value = "debtor_account_id")
+    private String debtorAccountId; // sub account id of debtor
 
     @Field(value = "credit")
     private long credit;
 
-    @Field(value = "creditor")
-    private String creditor; // account name of creditor, case insensitive
+    @Field(value = "creditor_account_id")
+    private String creditorAccountId; // sub account id of creditor
 
     @Field(value = "desc")
     private String desc;
