@@ -31,10 +31,13 @@ public class DayBookServiceImpl implements DayBookService {
         if (trx.isPresent()) {
             var trxObj = trx.get();
             if (trxObj.getFirst().equals(TransactionType.DEBIT)) {
-                return dayBookRepository.findByDebtor(trxObj.getSecond(), paging);
+                return dayBookRepository.findByDebtor(trxObj.getSecond(), paging)
+                        .onErrorResume((err) -> Flux.error(new RuntimeException("Error getting paginated journal: ".concat(err.getMessage()))));
             }
-            return dayBookRepository.findByCreditor(trxObj.getSecond(), paging);
+            return dayBookRepository.findByCreditor(trxObj.getSecond(), paging)
+                    .onErrorResume((err) -> Flux.error(new RuntimeException("Error getting paginated journal: ".concat(err.getMessage()))));
         }
-        return dayBookRepository.findAll().take(size).skip(page);
+        return dayBookRepository.findAll().take(size).skip(page)
+                .onErrorResume((err) -> Flux.error(new RuntimeException("Error getting paginated journal: ".concat(err.getMessage()))));
     }
 }
