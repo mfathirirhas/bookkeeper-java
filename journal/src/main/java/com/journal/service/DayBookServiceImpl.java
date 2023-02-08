@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,7 +23,7 @@ public class DayBookServiceImpl implements DayBookService {
     private DayBookRepository dayBookRepository;
 
     @Autowired
-    private PublisherService publisherService;
+    private KafkaTemplate<String, DayBook> kafkaTemplate;
 
     @Autowired
     private KafkaProperties kafkaProperties;
@@ -37,7 +38,7 @@ public class DayBookServiceImpl implements DayBookService {
             }
         }
         return dayBookRepository.insert(dayBook).map(result -> {
-            publisherService.publishDaybook(kafkaProperties.getDaybookTopic(), result).subscribe();
+            kafkaTemplate.send(kafkaProperties.getDaybookTopic(), result);
             return result;
         }).onErrorResume((err) -> Mono.error(new RuntimeException("Error inserting new journal entry: ".concat(err.getMessage()))));
     }
