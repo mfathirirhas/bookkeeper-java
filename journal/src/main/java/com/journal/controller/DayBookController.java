@@ -24,22 +24,23 @@ public class DayBookController {
     private DayBookService dayBookService;
 
     @GetMapping(value = "/ping", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity> ping() {
-        return Mono.just(ResponseEntity.ok().body("pong"));
+    public Mono<BaseResponse> ping() {
+        return Mono.just(BaseResponse.Ok("pong"));
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity> add(@RequestBody @Valid DayBook dayBook) {
+    public Mono<BaseResponse> add(@RequestBody @Valid DayBook dayBook) {
+
         return dayBookService.add(dayBook)
-                .map(daybook -> ResponseEntity.status(HttpStatus.CREATED).body(daybook))
-                .cast(ResponseEntity.class)
+                .map(daybook -> BaseResponse.Ok(daybook, 201))
+                .cast(BaseResponse.class)
                 .onErrorResume((err) -> Mono.just(
-                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error".concat(err.getMessage()))
+                        BaseResponse.InternalError("Error ", err.getMessage())
                 ));
     }
 
     @GetMapping("/paginate")
-    public Mono<ResponseEntity> paginate(
+    public Mono<BaseResponse> paginate(
             @RequestParam(name = "type", required = false) Optional<TransactionType> transactionType,
             @RequestParam(name = "name", required = false) Optional<Long> accountName,
             @RequestParam(defaultValue = "0") int page,
@@ -47,17 +48,17 @@ public class DayBookController {
     ) {
         if (transactionType.isEmpty()) {
             return dayBookService.paginate(page, size, Optional.empty()).collectList()
-                    .map(daybooks -> ResponseEntity.ok().body(daybooks))
-                    .cast(ResponseEntity.class)
+                    .map(daybooks -> BaseResponse.Ok(daybooks))
+                    .cast(BaseResponse.class)
                     .onErrorResume((err) -> Mono.just(
-                            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error".concat(err.getMessage()))
+                            BaseResponse.InternalError("Error ", err.getMessage())
                     ));
         }
         return dayBookService.paginate(page, size, Optional.of(Pair.of(transactionType.get(), accountName.orElse(Long.valueOf(0)))))
-                .map(daybooks -> ResponseEntity.ok().body(daybooks)).collectList()
-                .cast(ResponseEntity.class)
+                .map(daybooks -> BaseResponse.Ok(daybooks)).collectList()
+                .cast(BaseResponse.class)
                 .onErrorResume((err) -> Mono.just(
-                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error".concat(err.getMessage()))
+                        BaseResponse.InternalError("Error ", err.getMessage())
                 ));
     }
 }
