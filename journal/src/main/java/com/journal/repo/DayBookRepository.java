@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface DayBookRepository extends ReactiveMongoRepository<DayBook, Long> {
 
-    Flux<DayBook> findByDebtor(String debtor, Pageable pageable);
+    Flux<DayBook> findByDebtorAccountId(long debtorAccountId, Pageable pageable);
 
-    Flux<DayBook> findByCreditor(String creditor, Pageable pageable);
+    Flux<DayBook> findByCreditorAccountId(long creditorAccountId, Pageable pageable);
 }

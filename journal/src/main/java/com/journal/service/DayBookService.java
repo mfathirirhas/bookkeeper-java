@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface DayBookService {
     Mono<DayBook> add(DayBook dayBook);
 
-    Flux<DayBook> paginate(int page, int size, Optional<Pair<TransactionType, String>> trx);
+    Flux<DayBook> paginate(int page, int size, Optional<Pair<TransactionType, Long>> trx);
 }
