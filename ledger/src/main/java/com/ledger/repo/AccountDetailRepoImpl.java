@@ -1,4 +1,4 @@
-package com.ledger.repo.impl;
+package com.ledger.repo;
 
 public class AccountDetailRepoImpl {
 }

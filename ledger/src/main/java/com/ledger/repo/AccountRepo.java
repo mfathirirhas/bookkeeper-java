@@ -1,4 +1,4 @@
-package com.ledger.repo.api;
+package com.ledger.repo;
 
 import com.ledger.repo.models.Account;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

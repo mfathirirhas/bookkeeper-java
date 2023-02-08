@@ -76,7 +76,14 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.1.0.Final</version>
         </dependency>
-        <!-- Mongodb end-->
+        <!-- Mongodb end -->
+
+        <!-- kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <!-- kafka end -->
 
     </dependencies>
 </project>

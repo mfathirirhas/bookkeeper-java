@@ -1,6 +1,6 @@
 package com.ledger.service.impl;
 
-import com.ledger.repo.api.AccountDetailRepo;
+import com.ledger.repo.AccountDetailRepo;
 import com.ledger.repo.models.AccountDetail;
 import com.ledger.service.api.AccountDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
