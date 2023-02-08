@@ -31,7 +31,7 @@ public class DayBook extends Base {
     @Valid
     @NotNull(message = "debit cannot be null")
     @Range(min = 1, message = "cannot be 0")
-    private long debtorAccountId; // sub account id of debtor
+    private long debtorAccountId; // account id of debtor
 
     @Field(value = "credit")
     @Valid
@@ -43,7 +43,7 @@ public class DayBook extends Base {
     @Valid
     @NotNull(message = "debit cannot be null")
     @Range(min = 1, message = "cannot be 0")
-    private long creditorAccountId; // sub account id of creditor
+    private long creditorAccountId; // account id of creditor
 
     @Field(value = "desc")
     @NotNull(message = "debit cannot be null")
