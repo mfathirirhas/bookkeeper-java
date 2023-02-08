@@ -24,6 +24,10 @@ public class DayBookServiceImpl implements DayBookService {
     public Mono<DayBook> add(DayBook dayBook) {
         if (dayBook.getTimestamp() == null) {
             dayBook.setTimestamp(Date.from(Instant.now()));
+        } else {
+            if (dayBook.getTimestamp().after(Date.from(Instant.now()))) {
+                return Mono.error(new RuntimeException("Error inserting new journal entry: timestamp cannot be bigger than current time"));
+            }
         }
         return dayBookRepository.insert(dayBook)
                 .onErrorResume((err) -> Mono.error(new RuntimeException("Error inserting new journal entry: ".concat(err.getMessage()))));
