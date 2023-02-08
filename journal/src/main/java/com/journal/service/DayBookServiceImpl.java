@@ -1,5 +1,6 @@
 package com.journal.service;
 
+import com.journal.properties.KafkaProperties;
 import com.journal.repo.DayBookRepository;
 import com.journal.repo.models.DayBook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,12 @@ public class DayBookServiceImpl implements DayBookService {
     @Autowired
     private DayBookRepository dayBookRepository;
 
+    @Autowired
+    private PublisherService publisherService;
+
+    @Autowired
+    private KafkaProperties kafkaProperties;
+
     @Override
     public Mono<DayBook> add(DayBook dayBook) {
         if (dayBook.getTimestamp() == null) {
@@ -29,8 +36,10 @@ public class DayBookServiceImpl implements DayBookService {
                 return Mono.error(new RuntimeException("Error inserting new journal entry: timestamp cannot be bigger than current time"));
             }
         }
-        return dayBookRepository.insert(dayBook)
-                .onErrorResume((err) -> Mono.error(new RuntimeException("Error inserting new journal entry: ".concat(err.getMessage()))));
+        return dayBookRepository.insert(dayBook).map(result -> {
+            publisherService.publishDaybook(kafkaProperties.getDaybookTopic(), result).subscribe();
+            return result;
+        }).onErrorResume((err) -> Mono.error(new RuntimeException("Error inserting new journal entry: ".concat(err.getMessage()))));
     }
 
     @Override
