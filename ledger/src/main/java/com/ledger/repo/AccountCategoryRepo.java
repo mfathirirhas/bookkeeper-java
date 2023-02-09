@@ -1,10 +1,10 @@
 package com.ledger.repo;
 
-import com.ledger.repo.models.Account;
+import com.ledger.repo.models.AccountCategory;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AccountRepo extends ReactiveCrudRepository<Account, Long> {
-    Account findByCategory(String category);
+public interface AccountCategoryRepo extends ReactiveCrudRepository<AccountCategory, Long> {
+
 }

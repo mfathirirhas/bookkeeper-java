@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name = "accounts")
-public class Account extends Base {
+public class AccountCategory extends Base {
 
     @Column(name = "category")
     private String category;
@@ -21,6 +21,6 @@ public class Account extends Base {
     @Column(name = "desc")
     private String desc;
 
-    @OneToMany(mappedBy = "bk/account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<AccountDetail> accountDetailList;
+    @OneToMany(mappedBy = "bk/accountCategory", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Account> accountList;
 }
