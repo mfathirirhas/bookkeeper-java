@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 public class KafkaProperties {
 
     private String address;
-    private String daybookTopic;
+    private String dayBookTopic;
+    private String dayBookKey;
 
     public void setAddress(String address) {
         this.address = address;
@@ -18,11 +19,19 @@ public class KafkaProperties {
         return address;
     }
 
-    public String getDaybookTopic() {
-        return daybookTopic;
+    public String getDayBookTopic() {
+        return dayBookTopic;
     }
 
-    public void setDaybookTopic(String daybookTopic) {
-        this.daybookTopic = daybookTopic;
+    public void setDayBookTopic(String dayBookTopic) {
+        this.dayBookTopic = dayBookTopic;
+    }
+
+    public String getDayBookKey() {
+        return dayBookKey;
+    }
+
+    public void setDayBookKey(String dayBookKey) {
+        this.dayBookKey = dayBookKey;
     }
 }

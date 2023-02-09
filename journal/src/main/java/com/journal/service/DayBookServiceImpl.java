@@ -38,7 +38,8 @@ public class DayBookServiceImpl implements DayBookService {
             }
         }
         return dayBookRepository.insert(dayBook).map(result -> {
-            kafkaTemplate.send(kafkaProperties.getDaybookTopic(), result);
+            // TODO make it fire and forget
+            kafkaTemplate.send(kafkaProperties.getDayBookTopic(), kafkaProperties.getDayBookKey(), result);
             return result;
         }).onErrorResume((err) -> Mono.error(new RuntimeException("Error inserting new journal entry: ".concat(err.getMessage()))));
     }
