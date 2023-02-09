@@ -29,7 +29,7 @@ public class BaseResponse<T> {
     }
 
     public static <T> BaseResponse<T> InternalError(String message, String error, int... code) {
-        var httpCode = 200;
+        var httpCode = 500;
         if (code.length > 0) {
             httpCode = code[0];
         }
@@ -37,7 +37,7 @@ public class BaseResponse<T> {
     }
 
     public static <T> BaseResponse<T> ClientError(String message, String error, int... code) {
-        var httpCode = 200;
+        var httpCode = 400;
         if (code.length > 0) {
             httpCode = code[0];
         }

@@ -29,19 +29,19 @@ public class DayBook extends Base {
 
     @Field(value = "debtor_account_id")
     @Valid
-    @NotNull(message = "debit cannot be null")
-    @Range(min = 1, message = "cannot be 0")
+    @NotNull(message = "debtorAccountId cannot be null")
+    @Range(min = 1, message = "debtorAccountId cannot be 0")
     private long debtorAccountId; // account id of debtor
 
     @Field(value = "credit")
     @Valid
-    @NotNull(message = "debit cannot be null")
+    @NotNull(message = "credit cannot be null")
     @Range(min = 1, message = "cannot be 0")
     private long credit;
 
     @Field(value = "creditor_account_id")
     @Valid
-    @NotNull(message = "debit cannot be null")
+    @NotNull(message = "creditorAccountId cannot be null")
     @Range(min = 1, message = "cannot be 0")
     private long creditorAccountId; // account id of creditor
 

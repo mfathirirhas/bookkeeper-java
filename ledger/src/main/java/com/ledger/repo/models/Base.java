@@ -25,5 +25,5 @@ public abstract class Base implements Serializable {
     private Date updatedAt;
 
     @Field(value = "is_deleted")
-    private boolean isDeleted = Boolean.FALSE;
+    private int isDeleted = 0;
 }

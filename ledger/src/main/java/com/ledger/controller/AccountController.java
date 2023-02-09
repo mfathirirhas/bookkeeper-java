@@ -1,55 +1,77 @@
 package com.ledger.controller;
 
+import com.ledger.repo.models.AccountCategory;
 import com.ledger.repo.models.Account;
-import com.ledger.repo.models.AccountDetail;
-import com.ledger.service.api.AccountDetailService;
-import com.ledger.service.api.AccountService;
+import com.ledger.service.AccountCategoryService;
+import com.ledger.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/ledger")
 public class AccountController {
+
+    @Autowired
+    private AccountCategoryService accountCategoryService;
+
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private AccountDetailService accountDetailService;
-
-    @GetMapping("/ping")
-    public Mono<String> ping() {
-        return Mono.just("pong");
+    @GetMapping(value = "/ping", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<BaseResponse> ping() {
+        return Mono.just(BaseResponse.Ok("pong"));
     }
 
-    @GetMapping("/{id}")
-    public Flux<Account> getAccount(@PathVariable Optional<Long> accountId) {
-        if (accountId.isPresent()) {
-            return Flux.from(accountService.findById(accountId.get()).map(ac -> ac).or(Mono.empty()));
-        }
-        return accountService.findAllAccounts();
+
+    @PostMapping(value = "/account_category", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<BaseResponse> addAccountCategory(@RequestBody @Valid AccountCategory accountCategory) {
+        return accountCategoryService.insert(accountCategory)
+                .cast(BaseResponse.class)
+                .onErrorResume((err) -> Mono.just(
+                        BaseResponse.InternalError("Error ", err.getMessage())
+                ));
     }
 
-    @GetMapping("/account_detail/{id}")
-    public Flux<AccountDetail> getAccountDetail(@PathVariable Optional<Long> accountDetailId) {
-        if (accountDetailId.isPresent()) {
-            return Flux.from(accountDetailService.findById(accountDetailId.get()));
-        }
-        return accountDetailService.findAllAccountDetails();
+    @PostMapping(value = "/account", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<BaseResponse> addAccount(
+            @RequestParam(name = "category_id") long accountCategoryId,
+            @RequestBody @Valid Account account) {
+        return accountService.insert(accountCategoryId, account)
+                .cast(BaseResponse.class)
+                .onErrorResume((err) -> Mono.just(
+                        BaseResponse.InternalError("Error ", err.getMessage())
+                ));
     }
 
-    @PostMapping("")
-    public Mono<Account> addAccount(@RequestBody Account account) {
-        return accountService.insert(account);
+    @GetMapping(value = "/account_category", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<BaseResponse> findAccountCategory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return accountCategoryService.findAll(page, size).collectList()
+                .map(accountCategories -> BaseResponse.Ok(accountCategories))
+                .cast(BaseResponse.class)
+                .onErrorResume((err) -> Mono.just(
+                        BaseResponse.InternalError("Error ", err.getMessage())
+                ));
     }
 
-    @PostMapping("/{id}/detail")
-    public Mono<AccountDetail> addAccountDetail(
-            @PathVariable long accountId,
-            @RequestBody AccountDetail accountDetail) {
-        return accountDetailService.insert(accountId, accountDetail);
+    @GetMapping(value = "/account", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<BaseResponse> findAccount(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return accountService.findAll(page, size).collectList()
+                .map(accounts -> BaseResponse.Ok(accounts))
+                .cast(BaseResponse.class)
+                .onErrorResume((err) -> Mono.just(
+                        BaseResponse.InternalError("Error ", err.getMessage())
+                ));
     }
+
 }
