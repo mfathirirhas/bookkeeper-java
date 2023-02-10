@@ -17,11 +17,13 @@ import java.util.Date;
 public class GeneralLedger extends Base {
 
     @Column(name = "journal_id")
+    @Valid
     @NotNull
     @NotEmpty
     private String journalId; // mongo id `_id` from journal service
 
     @Column(name = "timestamp")
+    @Valid
     @NotNull
     @NotEmpty
     private Date timestamp;
@@ -32,17 +34,27 @@ public class GeneralLedger extends Base {
     @Range(min = 1, message = "cannot be 0")
     private long debit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "debtor_account_id", nullable = false)
-    private Account account;
+    @Field(value = "debtor_account_id")
+    @Valid
+    @NotNull(message = "debtor_account_id cannot be null")
+    @Range(min = 1, message = "cannot be 0")
+    private long debtorAccountId;
 
     @Field(value = "credit")
     @Valid
-    @NotNull(message = "debit cannot be null")
+    @NotNull(message = "credit cannot be null")
     @Range(min = 1, message = "cannot be 0")
     private long credit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "debtor_account_id", nullable = false)
-    private long creditorAccountId; // account id of creditor
+    @Field(value = "creditor_account_id")
+    @Valid
+    @NotNull(message = "creditor_account_id cannot be null")
+    @Range(min = 1, message = "cannot be 0")
+    private long creditorAccountId;
+
+    @Field(value = "desc")
+    @Valid
+    @NotNull(message = "desc cannot be null")
+    @NotEmpty
+    private String desc;
 }
