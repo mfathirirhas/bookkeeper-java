@@ -1,0 +1,121 @@
+version: '3.1'
+
+services:
+  bookkeeper-journal:
+    image: bookkeeper-journal:latest
+    container_name: journal
+    build:
+      context: ./journal
+      dockerfile: Dockerfile
+      args:
+        - PORT=8081
+    ports:
+      - 8081:8081
+    stdin_open: true
+    tty: true
+    depends_on:
+      - bookkeeper-journal-mongodb
+      - bookkeeper-kafka-server
+    networks:
+      - local
+
+  bookkeeper-ledger:
+    image: ledger:latest
+    container_name: bookkeeper-ledger
+    build:
+      context: ./ledger
+      dockerfile: Dockerfile
+      args:
+        - PORT=8082
+    ports:
+      - 8082:8082
+    stdin_open: true
+    tty: true
+    depends_on:
+      - bookkeeper-ledger-mysql
+      - bookkeeper-kafka-server
+    networks:
+      - local
+
+  bookkeeper-journal-mongodb:
+    image: mongo:latest
+    container_name: bookkeeper-journal-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=journal
+    volumes:
+      - vol-journal-mongodb:/var/loki/data
+    ports:
+      - 27017:27017
+    networks:
+      - local
+
+  bookkeeper-ledger-mysql:
+    image: mysql:8.0
+    container_name: bookkeeper-ledger-mysql
+    command: '--default-authentication-plugin=mysql_native_password'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ledger
+    ports:
+      - 3306:3306
+    volumes:
+      - vol-ledger-mysql:/var/lib/mysql
+    networks:
+      - local
+
+  # kafka services
+  bookkeeper-zookeeper:
+    image: confluentinc/cp-zookeeper:5.4.0
+    hostname: zookeeper
+    container_name: bookkeeper-zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    networks:
+      - local
+
+  bookkeeper-kafka-server:
+    image: confluentinc/cp-server:5.4.0
+    hostname: kafka-server
+    container_name: bookkeeper-kafka-server
+    depends_on:
+      - bookkeeper-zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-server:29092,PLAINTEXT_HOST://localhost:9092
+      - KAFKA_METRIC_REPORTERS=io.confluent.metrics.reporter.ConfluentMetricsReporter
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR=1
+      - CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS=kafka-server:29092
+      - CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT=zookeeper:2181
+      - CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS=1
+      - CONFLUENT_METRICS_ENABLE='true'
+      - CONFLUENT_SUPPORT_CUSTOMER_ID='anonymous'
+    networks:
+      - local
+
+  bookkeeper-kafka-client:
+    image: confluentinc/cp-kafka:5.4.0
+    hostname: kafka
+    container_name: bookkeeper-kafka-client
+    command: [ "tail", "-f", "/dev/null" ]
+    network_mode: host
+
+  # kafka related services
+
+volumes:
+  vol-journal-mongodb:
+  vol-ledger-mysql:
+
+
+networks:
+  local:
